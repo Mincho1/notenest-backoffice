@@ -11,7 +11,7 @@ const LoginPage = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/api/auth/login", { email, password });
+      const response = await axios.post("http://84.21.205.113:3001/api/docs#/Auth/AuthController_login", { email, password });
       localStorage.setItem("authToken", response.data.token);
       navigate("/dashboard"); 
     } catch (error: any) {
