@@ -6,18 +6,20 @@ const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://84.21.205.113:3001/api/docs#/Auth/AuthController_login", { email, password });
+      const response = await axios.post("http://84.21.205.113:3001/api/auth/login", { email, password });
       localStorage.setItem("authToken", response.data.token);
-      navigate("/dashboard"); 
+      navigate("/dashboard");
     } catch (error: any) {
       setError("Грешен имейл или парола.");
     }
   };
+
+  
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -31,7 +33,7 @@ const LoginPage = () => {
             </label>
             <input
               id="email"
-              type="email"
+              type="text"
               className="w-full p-3 border border-gray-300 rounded-lg"
               placeholder="Вашият имейл"
               value={email}
@@ -66,6 +68,7 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
 
 
   
