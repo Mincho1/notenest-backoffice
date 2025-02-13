@@ -12,14 +12,14 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post("http://84.21.205.113:3001/api/auth/login", { email, password });
-      localStorage.setItem("authToken", response.data.accessToken); // Записваме accessToken
-        
+      localStorage.setItem("authToken", response.data.accessToken);
+      console.log("Отговор от сървъра:", response.data);
+
+      navigate("/dashboard");
     } catch (error: any) {
-      console.error("Грешка при вход:", error.response?.data || error.message);
       setError("Грешен имейл или парола.");
     }
   };
-  
 
   
 
