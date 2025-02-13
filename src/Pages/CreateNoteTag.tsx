@@ -15,20 +15,30 @@ const CreateNoteTag = () => {
   
     try {
       const token = localStorage.getItem("authToken");
+  
       await axios.post(
         "http://84.21.205.113:3001/api/note-tags",
         { name: tagName },
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
       navigate("/dashboard");
     } catch (err) {
-      setError("Неуспешно създаване на тага");
+      console.error("Грешка при създаване на тага:", err);
+      setError("Неуспешно създаване на тага.");
     }
   };
+  
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleCreateTag();
+    }
+  };
+  
   
 
   return (
@@ -39,6 +49,7 @@ const CreateNoteTag = () => {
         placeholder="Въведете име на тага"
         value={tagName}
         onChange={(e) => setTagName(e.target.value)}
+        onKeyDown={handleKeyDown}
         className="px-4 py-2 border rounded-lg mb-4 w-80"
       />
       {error && <p className="text-red-500 mb-4">{error}</p>}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -6,23 +6,52 @@ const DeleteNoteTag = () => {
   const [tagName, setTagName] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [tags, setTags] = useState<{ id: string; name: string }[]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await axios.get("http://84.21.205.113:3001/api/note-tags", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setTags(response.data); 
+      } catch (err) {
+        setError("Неуспешно зареждане на тагове");
+      }
+    };
+    fetchTags();
+  }, []);
 
   const handleDeleteTag = async () => {
     if (!tagName.trim()) {
       setError("Моля, въведете име на тага");
       return;
     }
-    
+
+    const tagToDelete = tags.find((tag) => tag.name === tagName); 
+
+    if (!tagToDelete) {
+      setError("Тагът не съществува");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("authToken");
-      await axios.delete(`http://84.21.205.113:3001/api/note-tags/${tagName}`, {
+      await axios.delete(`http://84.21.205.113:3001/api/note-tags/${tagToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSuccess("Тагът беше успешно изтрит");
       setTagName("");
     } catch (err) {
       setError("Неуспешно изтриване на тага");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleDeleteTag();
     }
   };
 
@@ -36,6 +65,7 @@ const DeleteNoteTag = () => {
         placeholder="Въведете име на тага"
         value={tagName}
         onChange={(e) => setTagName(e.target.value)}
+        onKeyDown={handleKeyDown}
         className="px-4 py-2 border rounded-lg mb-4 w-80"
       />
       <button
@@ -55,3 +85,5 @@ const DeleteNoteTag = () => {
 };
 
 export default DeleteNoteTag;
+
+
