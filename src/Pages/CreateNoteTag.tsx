@@ -14,7 +14,7 @@ const CreateNoteTag = () => {
     }
   
     try {
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem("myToken");
   
       await axios.post(
         "http://84.21.205.113:3001/api/note-tags",

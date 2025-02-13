@@ -10,7 +10,7 @@ const DashboardPage = () => {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold mb-6">Добре дошли в Dashboard!</h1>
+      <h1 className="text-3xl font-bold mb-6">Note Nest Backoffice</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-4xl">
         <button

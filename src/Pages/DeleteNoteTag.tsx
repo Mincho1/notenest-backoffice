@@ -12,7 +12,7 @@ const DeleteNoteTag = () => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem("myToken");
         const response = await axios.get("http://84.21.205.113:3001/api/note-tags", {
           headers: { Authorization: `Bearer ${token}` },
         });
