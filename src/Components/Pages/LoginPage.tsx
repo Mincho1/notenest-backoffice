@@ -1,7 +1,8 @@
+import myImage from "../../assets/images/my-image.jpg";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import myImage from "../assets/images/my-image.jpg";
+import Cookies from "js-cookie";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
@@ -13,54 +14,53 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post("http://84.21.205.113:3001/api/auth/login", { email, password });
-      localStorage.setItem("myToken", response.data.accessToken);
-      console.log("Отговор от сървъра:", response.data);
+      
+      Cookies.set("accessToken", response.data.accessToken);
+      Cookies.set("refreshToken", response.data.refreshToken); 
 
       navigate("/dashboard");
     } catch (error: any) {
-      setError("Грешен имейл или парола.");
+      setError("Incorrect email or password.");
     }
   };
 
-  
-
   return (
     <div className="flex min-h-screen bg-black">
-      <div className="hidden lg:flex w-1/2 bg-white-500 justify-center items-center">
+      <div className="hidden lg:flex w-1/2 justify-center items-center">
         <img src={myImage} alt="Login Illustration" className="w-3/4" />
       </div>
 
       <div className="w-full lg:w-1/2 flex justify-center items-center p-6">
-        <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold mb-4 text-center">Вход в системата</h2>
+        <div className="w-full max-w-md bg-black p-8 rounded-lg border-2 border-white">
+          <h2 className="text-2xl font-semibold mb-4 text-center text-white">Login to the system</h2>
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
           <form onSubmit={handleLogin}>
             <div className="mb-4">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Имейл</label>
+              <label htmlFor="email" className="block text-sm font-medium text-white">Email</label>
               <input
                 id="email"
                 type="text"
-                className="w-full p-3 border border-gray-300 rounded-lg"
-                placeholder="Вашият имейл"
+                className="w-full p-3 border border-gray-300 rounded-lg text-white"
+                placeholder="Your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
             <div className="mb-6">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Парола</label>
+              <label htmlFor="password" className="block text-sm font-medium text-white">Password</label>
               <input
                 id="password"
                 type="password"
-                className="w-full p-3 border border-gray-300 rounded-lg"
-                placeholder="Вашата парола"
+                className="w-full p-3 border border-gray-300 rounded-lg text-white"
+                placeholder="Your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
-            <button type="submit" className="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-              Вход
+            <button type="submit" className="w-full p-3 bg-black text-white rounded-lg border-2 border-white hover:bg-white hover:text-black transition">
+              Log In
             </button>
           </form>
         </div>
@@ -70,6 +70,8 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+
 
 
 
