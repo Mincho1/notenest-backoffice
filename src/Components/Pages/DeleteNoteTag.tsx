@@ -61,9 +61,6 @@ const DeleteNoteTag = () => {
 
   return (
     <div className="w-full h-screen bg-black flex">
-      <div className="w-1/2 flex justify-center items-center">
-        <img src={myImage} alt="Login Illustration" className="w-3/4" />
-      </div>
 
       <div className="w-1/2 flex justify-center items-center p-6">
         <div className="w-full max-w-md bg-black p-8 rounded-lg border-2 border-white">
@@ -93,6 +90,9 @@ const DeleteNoteTag = () => {
             </button>
           </div>
         </div>
+      </div>
+      <div className="w-1/2 flex justify-center items-center">
+        <img src={myImage} alt="Login Illustration" className="w-3/4" />
       </div>
     </div>
   );
