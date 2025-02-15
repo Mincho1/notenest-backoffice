@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie"; 
-import noteNestLogog from "../../assets/images/noteNestLogo.jpg"
+import noteNestLogog from "../../assets/images/noteNestLogo.jpg";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
