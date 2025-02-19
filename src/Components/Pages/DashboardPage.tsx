@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import noteNestLogo from "../../assets/images/noteNestLogo.jpg";
+import { FaPencilAlt, FaTrashAlt } from "react-icons/fa"; // Импортиране на иконите
 
 interface NoteTag {
   id: string;
@@ -15,9 +16,17 @@ const DashboardPage = () => {
   const [noteTags, setNoteTags] = useState<NoteTag[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [reload, setReload] = useState(false); // Track reload to refetch tags
+  const [reload, setReload] = useState(false); 
+  const [isDeleteOpen, setDeleteOpen] = useState(false);
+  const [isEditOpen, setEditOpen] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<NoteTag | null>(null);
+  const [editedName, setEditedName] = useState(""); 
 
-  // Fetch Note Tags
+  const [deleteError, setDeleteError] = useState(""); 
+  const [deleteSuccess, setDeleteSuccess] = useState(""); 
+  const [editError, setEditError] = useState(""); 
+  const [editSuccess, setEditSuccess] = useState(""); 
+
   useEffect(() => {
     const fetchNoteTags = async () => {
       try {
@@ -45,22 +54,71 @@ const DashboardPage = () => {
     };
 
     fetchNoteTags();
-  }, [reload]); // Trigger reload when `reload` state changes
+  }, [reload]); 
 
-  // Reload logic from navigation state
   useEffect(() => {
     if (location.state?.reloadData) {
-      setReload((prev) => !prev); // Toggle reload state to refetch tags
+      setReload((prev) => !prev); 
     }
   }, [location.state?.reloadData]);
 
   const handleDelete = (id: string, name: string) => {
-    navigate("/delete-note-tag", { state: { id, name } });
+    setSelectedTag({ id, name });
+    setDeleteOpen(true); 
+    setDeleteError(""); 
+    setDeleteSuccess(""); 
+  };
+
+  const handleEdit = (id: string, name: string) => {
+    setSelectedTag({ id, name });
+    setEditedName(name);
+    setEditOpen(true); 
+    setEditError(""); 
+    setEditSuccess(""); 
   };
 
   const handleLogout = () => {
     Cookies.remove("accessToken");
-    navigate("/");
+    navigate("/"); // navigate to the login page
+  };
+
+  const handleDeleteTag = async () => {
+    try {
+      const accessToken = Cookies.get("accessToken");
+      await axios.delete(`http://84.21.205.113:3001/api/note-tags/${selectedTag?.id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      setDeleteSuccess("The tag was successfully deleted.");
+      setTimeout(() => {
+        setDeleteOpen(false);
+        setReload((prev) => !prev); 
+      }, 1000);
+    } catch (err) {
+      setDeleteError("Failed to delete the tag.");
+    }
+  };
+
+  const handleEditTag = async () => {
+    if (!editedName.trim()) {
+      setEditError("Please enter a valid tag name.");
+      return;
+    }
+
+    try {
+      const accessToken = Cookies.get("accessToken");
+      await axios.patch(
+        `http://84.21.205.113:3001/api/note-tags/${selectedTag?.id}`,
+        { name: editedName },
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+      setEditSuccess("The tag was successfully updated.");
+      setTimeout(() => {
+        setEditOpen(false);
+        setReload((prev) => !prev);
+      }, 1000);
+    } catch (err) {
+      setEditError("Failed to update the tag.");
+    }
   };
 
   if (loading) return <div className="text-white text-center mt-6">Loading...</div>;
@@ -95,19 +153,18 @@ const DashboardPage = () => {
             {noteTags.map(({ id, name }) => (
               <li key={id} className="flex justify-between px-6 py-4 text-white">
                 <span>{name}</span>
-                <div>
-                  <button
-                    onClick={() => navigate(`/edit-note-tag/${id}`, { state: { name } })}
-                    className="px-4 py-2 mr-2 bg-black text-white rounded-lg hover:bg-white hover:text-black border-2 border-white transition"
-                  >
-                    Edit
-                  </button>
-                  <button
+                <div className="flex gap-2">
+                  {/* Edit Button with Icon */}
+                  <FaPencilAlt
+                    onClick={() => handleEdit(id, name)}
+                    className="text-white text-xl cursor-pointer transition-colors duration-300 hover:text-blue-500"
+                  />
+                  
+                  {/* Delete Button with Icon */}
+                  <FaTrashAlt
                     onClick={() => handleDelete(id, name)}
-                    className="px-4 py-2 bg-black text-white rounded-lg hover:bg-white hover:text-black border-2 border-white transition"
-                  >
-                    Delete
-                  </button>
+                    className="text-white text-xl cursor-pointer transition-colors duration-300 hover:text-red-500"
+                  />
                 </div>
               </li>
             ))}
@@ -121,6 +178,60 @@ const DashboardPage = () => {
       >
         Logout
       </button>
+
+      {isEditOpen && selectedTag && (
+        <dialog open className="w-full max-w-md bg-black p-8 rounded-lg border-2 border-white text-center fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+          <h1 className="text-2xl font-bold text-white mb-4">Edit Note Tag</h1>
+          {editError && <p className="text-red-500">{editError}</p>}
+          {editSuccess && <p className="text-green-500">{editSuccess}</p>}
+          <p className="text-white mb-4">Edit the name of the tag</p>
+          <input
+            type="text"
+            value={editedName}
+            onChange={(e) => setEditedName(e.target.value)}
+            className="w-full px-4 py-2 mb-4 border-2 border-white rounded-lg text-white bg-black"
+          />
+          <div className="flex justify-between gap-4">
+            <button
+              onClick={handleEditTag} 
+              className="px-6 py-2 bg-black text-white rounded-lg hover:bg-white hover:text-black transition border-2 border-white w-1/2"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => setEditOpen(false)} 
+              className="px-6 py-2 bg-black text-white rounded-lg hover:bg-white hover:text-black transition border-2 border-white w-1/2"
+            >
+              Cancel
+            </button>
+          </div>
+        </dialog>
+      )}
+
+      {isDeleteOpen && selectedTag && (
+        <dialog open className="w-full max-w-md bg-black p-8 rounded-lg border-2 border-white text-center fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+          <h1 className="text-2xl font-bold text-white mb-4">Delete Note Tag</h1>
+          {deleteError && <p className="text-red-500">{deleteError}</p>}
+          {deleteSuccess && <p className="text-green-500">{deleteSuccess}</p>}
+          <p className="text-white mb-4">
+            Are you sure you want to delete the tag "{selectedTag.name}"?
+          </p>
+          <div className="flex justify-between gap-4">
+            <button
+              onClick={handleDeleteTag} 
+              className="px-6 py-2 bg-black text-white rounded-lg hover:bg-white hover:text-black transition border-2 border-white w-1/2"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => setDeleteOpen(false)} 
+              className="px-6 py-2 bg-black text-white rounded-lg hover:bg-white hover:text-black transition border-2 border-white w-1/2"
+            >
+              Cancel
+            </button>
+          </div>
+        </dialog>
+      )}
     </div>
   );
 };
