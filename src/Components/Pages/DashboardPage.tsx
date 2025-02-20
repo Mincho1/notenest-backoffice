@@ -79,7 +79,7 @@ const DashboardPage = () => {
 
   const handleLogout = () => {
     Cookies.remove("accessToken");
-    navigate("/"); // navigate to the login page
+    navigate("/");
   };
 
   const handleDeleteTag = async () => {
@@ -154,13 +154,11 @@ const DashboardPage = () => {
               <li key={id} className="flex justify-between px-6 py-4 text-white">
                 <span>{name}</span>
                 <div className="flex gap-2">
-                  {/* Edit Button with Icon */}
                   <FaPencilAlt
                     onClick={() => handleEdit(id, name)}
                     className="text-white text-xl cursor-pointer transition-colors duration-300 hover:text-blue-500"
                   />
                   
-                  {/* Delete Button with Icon */}
                   <FaTrashAlt
                     onClick={() => handleDelete(id, name)}
                     className="text-white text-xl cursor-pointer transition-colors duration-300 hover:text-red-500"
