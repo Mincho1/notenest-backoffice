@@ -3,7 +3,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import noteNestLogo from "../../assets/images/noteNestLogo.jpg";
-import { FaPencilAlt, FaTrashAlt } from "react-icons/fa"; // Импортиране на иконите
+import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
+
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 interface NoteTag {
   id: string;
@@ -16,16 +18,16 @@ const DashboardPage = () => {
   const [noteTags, setNoteTags] = useState<NoteTag[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [reload, setReload] = useState(false); 
+  const [reload, setReload] = useState(false);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const [isEditOpen, setEditOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<NoteTag | null>(null);
-  const [editedName, setEditedName] = useState(""); 
+  const [editedName, setEditedName] = useState("");
 
-  const [deleteError, setDeleteError] = useState(""); 
-  const [deleteSuccess, setDeleteSuccess] = useState(""); 
-  const [editError, setEditError] = useState(""); 
-  const [editSuccess, setEditSuccess] = useState(""); 
+  const [deleteError, setDeleteError] = useState("");
+  const [deleteSuccess, setDeleteSuccess] = useState("");
+  const [editError, setEditError] = useState("");
+  const [editSuccess, setEditSuccess] = useState("");
 
   useEffect(() => {
     const fetchNoteTags = async () => {
@@ -35,11 +37,12 @@ const DashboardPage = () => {
           setError("No access token found. Please log in.");
           return;
         }
-
-        const response = await axios.get("http://84.21.205.113:3001/api/note-tags", {
+  
+        const response = await axios.get(`${BASE_URL}/api/note-tags`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-
+  
+        console.log("API Response:", response);
         if (Array.isArray(response.data)) {
           setNoteTags(response.data);
         } else {
@@ -52,29 +55,29 @@ const DashboardPage = () => {
         setLoading(false);
       }
     };
-
+  
     fetchNoteTags();
-  }, [reload]); 
+  }, [reload]);
 
   useEffect(() => {
     if (location.state?.reloadData) {
-      setReload((prev) => !prev); 
+      setReload((prev) => !prev);
     }
   }, [location.state?.reloadData]);
 
   const handleDelete = (id: string, name: string) => {
     setSelectedTag({ id, name });
-    setDeleteOpen(true); 
-    setDeleteError(""); 
-    setDeleteSuccess(""); 
+    setDeleteOpen(true);
+    setDeleteError("");
+    setDeleteSuccess("");
   };
 
   const handleEdit = (id: string, name: string) => {
     setSelectedTag({ id, name });
     setEditedName(name);
-    setEditOpen(true); 
-    setEditError(""); 
-    setEditSuccess(""); 
+    setEditOpen(true);
+    setEditError("");
+    setEditSuccess("");
   };
 
   const handleLogout = () => {
@@ -85,13 +88,13 @@ const DashboardPage = () => {
   const handleDeleteTag = async () => {
     try {
       const accessToken = Cookies.get("accessToken");
-      await axios.delete(`http://84.21.205.113:3001/api/note-tags/${selectedTag?.id}`, {
+      await axios.delete(`${BASE_URL}/api/note-tags/${selectedTag?.id}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setDeleteSuccess("The tag was successfully deleted.");
       setTimeout(() => {
         setDeleteOpen(false);
-        setReload((prev) => !prev); 
+        setReload((prev) => !prev);
       }, 1000);
     } catch (err) {
       setDeleteError("Failed to delete the tag.");
@@ -107,7 +110,7 @@ const DashboardPage = () => {
     try {
       const accessToken = Cookies.get("accessToken");
       await axios.patch(
-        `http://84.21.205.113:3001/api/note-tags/${selectedTag?.id}`,
+        `${BASE_URL}/api/note-tags/${selectedTag?.id}`,
         { name: editedName },
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
