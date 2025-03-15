@@ -18,7 +18,6 @@ const CreateNoteTag = () => {
     try {
       const accessToken = Cookies.get("accessToken");
 
-      // Използване на .env променливата за URL
       const BASE_URL = import.meta.env.VITE_BASE_URL;
 
       await axios.post(
