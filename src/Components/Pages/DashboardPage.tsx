@@ -16,17 +16,16 @@ const DashboardPage = () => {
   const location = useLocation();
 
   const [noteTags, setNoteTags] = useState<NoteTag[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
   const [isCreateOpen, setCreateOpen] = useState(false);
-  const [isEditOpen, setEditOpen] = useState(false);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
+  const [isEditOpen, setEditOpen] = useState(false);
 
   const [tagName, setTagName] = useState("");
   const [editedName, setEditedName] = useState("");
+  const [error, setError] = useState("");
   const [selectedTag, setSelectedTag] = useState<NoteTag | null>(null);
 
+  // Функция за зареждане на таговете от API
   useEffect(() => {
     const fetchNoteTags = async () => {
       try {
@@ -47,14 +46,13 @@ const DashboardPage = () => {
         }
       } catch (err) {
         setError("Failed to load Note Tags.");
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchNoteTags();
   }, [location.state?.reloadData]);
 
+  // Функция за създаване на нов таг
   const handleCreateTag = async () => {
     if (!tagName.trim()) {
       setError("The tag name cannot be empty.");
@@ -79,6 +77,7 @@ const DashboardPage = () => {
     }
   };
 
+  // Функция за редактиране на таг
   const handleEditTag = async () => {
     if (!editedName.trim()) {
       setError("Tag name cannot be empty.");
@@ -102,6 +101,7 @@ const DashboardPage = () => {
     }
   };
 
+  // Функция за изтриване на таг
   const handleDeleteTag = async () => {
     try {
       const accessToken = Cookies.get("accessToken");
@@ -118,13 +118,11 @@ const DashboardPage = () => {
     }
   };
 
+  // Логин и навигация
   const handleLogout = () => {
     Cookies.remove("accessToken");
     navigate("/");
   };
-
-  if (loading) return <div className="text-white text-center mt-6">Loading...</div>;
-  if (error) return <div className="text-red-500 text-center mt-6">{error}</div>;
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-black text-white p-6">
@@ -132,19 +130,19 @@ const DashboardPage = () => {
         Note Nest
       </h1>
 
-      <div className="w-full max-w-3xl bg-black border border-gray-800 rounded-xl shadow-2xl p-8 text-center">
+      <div className="w-full max-w-3xl bg-black border border-white/20 rounded-2xl shadow-2xl p-8">
         <div className="flex justify-between items-center mb-6">
-          <span className="text-xl font-semibold text-white">Tags</span>
+          <span className="text-xl font-semibold">Tags</span>
           <div className="flex gap-4">
             <button
               onClick={() => setCreateOpen(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-300 transition-transform transform hover:scale-105 shadow-xl font-bold"
+              className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-lg hover:brightness-90 transition-all shadow-md font-bold"
             >
               <FaPlus /> Create Tag
             </button>
             <button
               onClick={handleLogout}
-              className="px-6 py-3 bg-black text-white rounded-lg border-2 border-white hover:bg-white hover:text-black font-bold"
+              className="px-6 py-3 border border-white rounded-lg text-white hover:bg-white hover:text-black font-bold transition-all"
             >
               Logout
             </button>
@@ -152,15 +150,15 @@ const DashboardPage = () => {
         </div>
 
         {noteTags.length === 0 ? (
-          <p className="text-center text-gray-400 italic">No tags available.</p>
+          <p className="text-center text-white/60 italic">No tags available.</p>
         ) : (
           <div className="grid grid-cols-1 gap-4">
             {noteTags.map(({ id, name }) => (
               <div
                 key={id}
-                className="flex justify-between items-center p-5 bg-black rounded-lg transition-transform transform hover:scale-105 shadow-md hover:bg-gray-800 border border-gray-700"
+                className="flex justify-between items-center p-5 bg-white/5 rounded-xl border border-white/10"
               >
-                <span className="text-lg font-medium tracking-wide text-white">{name}</span>
+                <span className="text-lg">{name}</span>
                 <div className="flex gap-4">
                   <FaPencilAlt
                     onClick={() => {
@@ -168,7 +166,7 @@ const DashboardPage = () => {
                       setEditedName(name);
                       setEditOpen(true);
                     }}
-                    className="cursor-pointer text-gray-400 hover:text-white transition"
+                    className="cursor-pointer text-white/60 hover:text-white transition"
                   />
                   <FaTrashAlt
                     onClick={() => {
@@ -186,8 +184,8 @@ const DashboardPage = () => {
 
       {/* Create Modal */}
       {isCreateOpen && (
-        <dialog open className="w-full max-w-md bg-black p-8 rounded-lg border border-gray-700 text-center fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 shadow-2xl">
-          <h1 className="text-3xl font-bold text-white mb-4">Create Note Tag</h1>
+        <dialog open className="w-full max-w-md bg-black/90 p-8 rounded-xl border border-white/20 text-center fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 shadow-2xl backdrop-blur-md">
+          <h1 className="text-3xl font-bold mb-4 text-white">Create Note Tag</h1>
           {error && <p className="text-red-500 mb-4">{error}</p>}
           <input
             type="text"
@@ -197,7 +195,7 @@ const DashboardPage = () => {
             onKeyDown={(e) => {
               if (e.key === "Enter") handleCreateTag();
             }}
-            className="w-full px-4 py-3 border border-gray-700 rounded-lg text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 mb-4 shadow-lg"
+            className="w-full px-4 py-3 border border-white/10 rounded-lg bg-white/10 text-white focus:outline-none mb-4"
           />
           <div className="flex justify-between gap-4">
             <button
@@ -206,13 +204,13 @@ const DashboardPage = () => {
                 setTagName("");
                 setError("");
               }}
-              className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition border border-gray-600 w-1/2 shadow-lg font-bold"
+              className="px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 w-1/2 font-bold"
             >
               Cancel
             </button>
             <button
               onClick={handleCreateTag}
-              className="px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-200 transition border border-gray-600 w-1/2 shadow-lg font-bold"
+              className="px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-300 w-1/2 font-bold"
             >
               Create
             </button>
@@ -222,25 +220,25 @@ const DashboardPage = () => {
 
       {/* Edit Modal */}
       {isEditOpen && selectedTag && (
-        <dialog open className="w-full max-w-md bg-black p-8 rounded-lg border border-gray-700 text-center fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 shadow-2xl">
-          <h1 className="text-3xl font-bold text-white mb-4">Edit Note Tag</h1>
+        <dialog open className="w-full max-w-md bg-black/90 p-8 rounded-xl border border-white/20 text-center fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 shadow-2xl backdrop-blur-md">
+          <h1 className="text-3xl font-bold mb-4 text-white">Edit Note Tag</h1>
           <input
             type="text"
             value={editedName}
             onChange={(e) => setEditedName(e.target.value)}
-            className="w-full px-4 py-3 mb-4 border border-gray-700 rounded-lg text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 shadow-lg"
+            className="w-full px-4 py-3 mb-4 border border-white/10 rounded-lg bg-white/10 text-white focus:outline-none"
             placeholder="Enter new tag name"
           />
           <div className="flex justify-between gap-4">
             <button
               onClick={() => setEditOpen(false)}
-              className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition border border-gray-600 w-1/2 shadow-lg font-bold"
+              className="px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 w-1/2 font-bold"
             >
               Cancel
             </button>
             <button
               onClick={handleEditTag}
-              className="px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-200 transition border border-gray-600 w-1/2 shadow-lg font-bold"
+              className="px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-300 w-1/2 font-bold"
             >
               Save
             </button>
@@ -250,21 +248,21 @@ const DashboardPage = () => {
 
       {/* Delete Modal */}
       {isDeleteOpen && selectedTag && (
-        <dialog open className="w-full max-w-md bg-black p-8 rounded-lg border border-gray-700 text-center fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 shadow-2xl">
-          <h1 className="text-3xl font-bold text-white mb-4">Delete Note Tag</h1>
-          <p className="text-white mb-4 text-lg">
-            Are you sure you want to delete the tag "{selectedTag.name}"?
+        <dialog open className="w-full max-w-md bg-black/90 p-8 rounded-xl border border-white/20 text-center fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 shadow-2xl backdrop-blur-md">
+          <h1 className="text-3xl font-bold mb-4 text-white">Delete Note Tag</h1>
+          <p className="mb-6 text-lg text-white/90">
+            Are you sure you want to delete <strong>{selectedTag.name}</strong>?
           </p>
           <div className="flex justify-between gap-4">
             <button
               onClick={() => setDeleteOpen(false)}
-              className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition border border-gray-600 w-1/2 shadow-lg font-bold"
+              className="px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 w-1/2 font-bold"
             >
               Cancel
             </button>
             <button
               onClick={handleDeleteTag}
-              className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition border border-gray-600 w-1/2 shadow-lg font-bold"
+              className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 w-1/2 font-bold"
             >
               Delete
             </button>
